@@ -8,15 +8,23 @@ const getUsers = (req, res) => {
 };
 
 const getUser = (req, res) => {
-  User.findById(req.params.userId)
+  const { userId } = req.params;
+
+  User.findById(userId)
     .then((user) => {
       if (user) {
         res.send({ data: user });
       } else {
-        res.status(ERROR_CODE.NOT_FOUND).send({ message: 'Пользователь не найден' });
+        res.status(ERROR_CODE.NOT_FOUND).send({ message: 'Пользователь по указанному id не найден' });
       }
     })
-    .catch((err) => {});
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(ERROR_CODE.BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(ERROR_CODE.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+      }
+    });
 };
 
 const postUser = (req, res) => {
@@ -24,7 +32,13 @@ const postUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
-    .catch((err) => {});
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(ERROR_CODE.BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя' });
+      } else {
+        res.status(ERROR_CODE.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+      }
+    });
 };
 
 const updateUser = (req, res) => {
@@ -32,7 +46,15 @@ const updateUser = (req, res) => {
 
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.send({ data: user }))
-    .catch((err) => {});
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(ERROR_CODE.BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля' });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(ERROR_CODE.NOT_FOUND).send({ message: 'Пользователь с указанным id не найден' });
+      } else {
+        res.status(ERROR_CODE.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+      }
+    });
 };
 
 const updateUserAvatar = (req, res) => {
@@ -40,7 +62,15 @@ const updateUserAvatar = (req, res) => {
 
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => ({ data: user }))
-    .catch((err) => {});
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(ERROR_CODE.BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении аватара' });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(ERROR_CODE.NOT_FOUND).send({ message: 'Пользователь с указанным id не найден' });
+      } else {
+        res.status(ERROR_CODE.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+      }
+    });
 };
 
 module.exports = {
