@@ -16,4 +16,4 @@
 `npm run dev` — запускает сервер с hot-reload
 
 ## Ссылка на репозиторий
-[](https://github.com/californikate/express-mesto-gha)
+[Проект Mesto бэкэнд](https://github.com/californikate/express-mesto-gha)
