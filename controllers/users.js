@@ -1,18 +1,20 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
 const { ERROR_CODE } = require('../utils/const');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
-    .catch(() => res.status(ERROR_CODE.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' }));
+    .then((users) => res.send({ users }))
+    .catch(next);
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
-    .orFail(new Error('NotValidId'))
-    .then((user) => res.send({ data: user }))
+    .orFail(() => next(new Error('NotValidId'))
+    .then((user) => res.send({ user }))
     .catch((err) => {
       if (err.message === 'NotValidId') {
         res.status(ERROR_CODE.NOT_FOUND).send({ message: 'Пользователь по указанному id не найден' });
@@ -25,9 +27,21 @@ const getUser = (req, res) => {
 };
 
 const postUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
 
-  User.create({ name, about, avatar })
+  User.create({
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  })
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -70,6 +84,25 @@ const updateUserAvatar = (req, res) => {
         res.status(ERROR_CODE.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
       }
     });
+
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'super-strong-secret',
+        { expiresIn: '7d' }
+      );
+
+      res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
 };
 
 module.exports = {
@@ -78,4 +111,5 @@ module.exports = {
   postUser,
   updateUser,
   updateUserAvatar,
+  login
 };
