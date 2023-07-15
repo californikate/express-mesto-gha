@@ -7,4 +7,6 @@ const ERROR_CODE = {
   SERVER_ERROR: 500,
 };
 
-module.exports = { ERROR_CODE };
+const linkRegex = /^https?:\/\/(www\.)?[\w\-._~:/?#[\]@!$&'()*+,;=]{2,}\.[a-zA-Z0-9./?#-]{2,}#?$/;
+
+module.exports = { ERROR_CODE, linkRegex };
