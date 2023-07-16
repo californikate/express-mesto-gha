@@ -27,14 +27,12 @@ const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findById(cardId)
-    .orFail(() => {
-      throw new NotFoundError('Карточка с указанным id не найдена');
-    })
+    .orFail(() => next(new NotFoundError('Карточка с указанным id не найдена')))
     .then((card) => {
       if (card.owner.toString() === req.user._id) {
-        Card.findByIdAndRemove(req.params.cardId);
+        Card.findByIdAndRemove(cardId);
       } else {
-        throw new ForbiddenError('Невозможно удалить карточку другого пользователя');
+        next(new ForbiddenError('Невозможно удалить карточку другого пользователя'));
       }
     })
     .then((card) => {
@@ -52,14 +50,14 @@ const deleteCard = (req, res, next) => {
 };
 
 const putLike = (req, res, next) => {
+  const { cardId } = req.params;
+
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => {
-      throw new NotFoundError('Карточка с указанным id не найдена');
-    })
+    .orFail(() => next(new NotFoundError('Карточка с указанным id не найдена')))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'NotFoundError') {
@@ -73,14 +71,14 @@ const putLike = (req, res, next) => {
 };
 
 const deleteLike = (req, res, next) => {
+  const { cardId } = req.params;
+
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => {
-      throw new NotFoundError('Карточка с указанным id не найдена');
-    })
+    .orFail(() => next(new NotFoundError('Карточка с указанным id не найдена')))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'NotFoundError') {
