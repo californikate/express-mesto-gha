@@ -9,7 +9,7 @@ const {
   updateUserAvatar,
 } = require('../controllers/users');
 
-const { linkRegex } = require('../utils/const');
+const { LINK_REGEX } = require('../utils/const');
 
 router.get('/users', getUsers);
 router.get('/users/me', getCurrentUser);
@@ -36,7 +36,7 @@ router.patch(
   '/users/me/avatar',
   celebrate({
     body: Joi.object().keys({
-      avatar: Joi.string().required().regex(linkRegex),
+      avatar: Joi.string().required().regex(LINK_REGEX),
     }),
   }),
   updateUserAvatar,

@@ -1,6 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 const router = require('express').Router();
-const { linkRegex } = require('../utils/const');
+const { LINK_REGEX } = require('../utils/const');
 const { postUser, login } = require('../controllers/users');
 
 router.post(
@@ -9,7 +9,7 @@ router.post(
     body: Joi.object().keys({
       name: Joi.string().optional().min(2).max(30),
       about: Joi.string().optional().min(2).max(30),
-      avatar: Joi.string().optional().regex(linkRegex),
+      avatar: Joi.string().optional().regex(LINK_REGEX),
       email: Joi.string().required().email(),
       password: Joi.string().required(),
     }),

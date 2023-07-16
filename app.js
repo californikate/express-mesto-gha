@@ -7,7 +7,7 @@ const { errors } = require('celebrate');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const authRouter = require('./routes/auth');
-const otherRoutes = require('./routes/index');
+const otherRouter = require('./routes/index');
 const authMiddle = require('./middlewares/auth');
 const errorsMiddle = require('./middlewares/errors');
 
@@ -26,7 +26,7 @@ app.use(authRouter);
 app.use(authMiddle);
 app.use(usersRouter);
 app.use(cardsRouter);
-app.use(otherRoutes);
+app.use(otherRouter);
 
 app.use(errors());
 app.use(errorsMiddle);

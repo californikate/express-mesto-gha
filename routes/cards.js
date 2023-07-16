@@ -9,7 +9,7 @@ const {
   deleteLike,
 } = require('../controllers/cards');
 
-const { linkRegex } = require('../utils/const');
+const { LINK_REGEX } = require('../utils/const');
 
 router.get('/cards', getCards);
 router.post(
@@ -17,7 +17,7 @@ router.post(
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
-      link: Joi.string().required().regex(linkRegex),
+      link: Joi.string().required().regex(LINK_REGEX),
     }),
   }),
   postCard,
